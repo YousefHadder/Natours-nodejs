@@ -1,0 +1,30 @@
+{
+	"name": "natours",
+	"version": "1.0.0",
+	"description": "First NodeJs project for NodeJs Express Course by Jonas Schmedtmann",
+	"main": "app.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "nodemon app.js"
+	},
+	"keywords": [],
+	"author": "Yousef Y Hadder",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.19.2"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.6.0",
+		"eslint": "^9.6.0",
+		"eslint-config-airbnb": "^19.0.4",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-jsx-a11y": "^6.9.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^5.1.3",
+		"eslint-plugin-react": "^7.34.3",
+		"globals": "^15.8.0",
+		"nodemon": "^3.1.4",
+		"prettier": "^3.3.2"
+	}
+}
