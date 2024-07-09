@@ -4,6 +4,30 @@ const tours = JSON.parse(
 	fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8'),
 );
 
+exports.checkBody = (req, res, next) => {
+	const { name, price } = req.body;
+	if (!name || !price) {
+		return res.status(400).json({
+			status: 'fail',
+			message: 'Name and price are required.',
+		});
+	}
+	next();
+};
+
+exports.checkId = (req, res, next, val) => {
+	const index = tours.findIndex((t) => t.id === parseInt(val, 10));
+	if (index === -1) {
+		return res.status(404).json({
+			status: 'fail',
+			message: 'Invalid ID.',
+		});
+	}
+	req.index = index;
+	console.log(req.index);
+	next();
+};
+
 exports.getAllTours = (req, res) => {
 	res.status(200).json({
 		status: 'success',
@@ -13,14 +37,7 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTourById = (req, res) => {
-	const { id } = req.params;
-	const tour = tours.find((t) => t.id === parseInt(id));
-	if (!tour) {
-		return res.status(404).json({
-			status: 'fail',
-			message: 'Invalid ID.',
-		});
-	}
+	const tour = tours[req.index];
 	res.status(200).json({
 		status: 'success',
 		data: { tour },
@@ -45,16 +62,8 @@ exports.createTour = (req, res) => {
 };
 
 exports.updateTourById = (req, res) => {
-	const { id } = req.params;
-	const index = tours.findIndex((t) => t.id === parseInt(id));
-	if (index === -1) {
-		return res.status(404).json({
-			status: 'fail',
-			message: 'Invalid ID.',
-		});
-	}
-	const updatedTour = Object.assign(tours[index], req.body);
-	tours[index] = updatedTour;
+	const updatedTour = Object.assign(tours[req.index], req.body);
+	tours[req.index] = updatedTour;
 	fs.writeFile(
 		`${__dirname}/../dev-data/data/tours-simple.json`,
 		JSON.stringify(tours),
@@ -69,15 +78,7 @@ exports.updateTourById = (req, res) => {
 };
 
 exports.deleteTourById = (req, res) => {
-	const { id } = req.params;
-	const index = tours.findIndex((t) => t.id === parseInt(id));
-	if (index === -1) {
-		return res.status(404).json({
-			status: 'fail',
-			message: 'Invalid ID.',
-		});
-	}
-	tours.splice(index, 1);
+	tours.splice(req.index, 1);
 	fs.writeFile(
 		`${__dirname}/../dev-data/data/tours-simple.json`,
 		JSON.stringify(tours),
