@@ -38,7 +38,7 @@ bower_components/
 *.sw?
 
 # dotenv environment variables file
-.env
+config.env
 
 # Build directories
 dist/
