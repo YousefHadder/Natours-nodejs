@@ -31,6 +31,8 @@ bower_components/
 # Editor directories and files
 .idea/
 .vscode/
+dev-data/
+public/
 *.suo
 *.ntvs*
 *.njsproj
