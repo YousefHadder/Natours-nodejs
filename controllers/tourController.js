@@ -90,10 +90,14 @@ exports.updateTourById = async (req, res) => {
 exports.deleteTourById = async (req, res) => {
 	try {
 		const { id } = req.params;
-		await Tour.findByIdAndDelete(id);
-		res.status(204).json({
+		const result = await Tour.findByIdAndDelete(id);
+		if (!result) {
+			throw new Error('Tour not found');
+		}
+		res.status(200).json({
 			status: 'success',
 			message: 'Tour deleted successfully.',
+			result,
 		});
 	} catch (err) {
 		res.status(404).json({
