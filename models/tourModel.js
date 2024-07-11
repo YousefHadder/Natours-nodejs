@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
 	{
@@ -7,6 +8,13 @@ const tourSchema = new mongoose.Schema(
 			type: String,
 			required: [true, 'A tour must have a name'],
 			unique: true,
+			trim: true,
+			validate: [
+				validator.isLength(
+					{ min: 5, max: 50 },
+					'Tour name must be between 5 and 50 characters',
+				),
+			]f,
 		},
 		slug: String,
 		duration: {
@@ -19,12 +27,17 @@ const tourSchema = new mongoose.Schema(
 		},
 		difficulty: {
 			type: String,
-			enum: ['easy', 'medium', 'difficult'],
+			enum: {
+				values: ['easy', 'medium', 'difficult'],
+				message: 'Difficulty must be easy, medium, or difficult',
+			},
 			required: [true, 'A tour must have a difficulty'],
 		},
 		ratingsAverage: {
 			type: Number,
 			default: 4.5,
+			min: [1, 'Rating must be between 1 and 5'],
+			max: [5, 'Rating must be between 1 and 5'],
 		},
 		ratingsQuantity: {
 			type: Number,
@@ -37,6 +50,13 @@ const tourSchema = new mongoose.Schema(
 		priceDiscount: {
 			type: Number,
 			default: 0,
+			validate: {
+				// this keyword only points to the current doc on NEW documents creation
+				validator: function (val) {
+					return val >= 0 && val <= 100;
+				},
+				message: 'Price discount {VALUE}% must be between 0 and 100',
+			},
 		},
 		summary: {
 			type: String,
@@ -83,10 +103,14 @@ tourSchema.pre('save', function (next) {
 	next();
 });
 tourSchema.post('save', async function (doc, next) {
-	console.log(`New tour created in ${Date.now() - doc.sta} milliseconds`);
+	console.log(
+		`New tour is created in ${Date.now() - doc.start} milliseconds`,
+	);
 });
 
 // 2) Query Middleware
+
+// Calculate Query execution time
 tourSchema.pre(/^find/, function (next) {
 	this.find({ secretTour: { $ne: true } });
 	this.start = Date.now();
@@ -98,6 +122,8 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 // 3) Aggregation Middleware
+
+// Hide secret tours from stats response
 tourSchema.pre('aggregate', function (next) {
 	this.pipeline().unshift({
 		$match: {
