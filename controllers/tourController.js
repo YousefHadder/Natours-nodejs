@@ -4,9 +4,9 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 exports.aliasTop5Tours = async (req, res, next) => {
-	req.params.limit = '5';
-	req.params.sort = '-ratingsAverage,price';
-	req.params.fields = 'name,price,ratingsAverage,difficulty';
+	req.query.limit = '5';
+	req.query.sort = '-ratingsAverage,price';
+	req.query.fields = 'name,price,ratingsAverage,difficulty';
 	next();
 };
 
@@ -29,6 +29,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 exports.getTourById = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
 	const tourQuery = await Tour.findById(id);
+
 	if (!tourQuery) {
 		return next(new AppError('No tour found with that ID', 404));
 	}
