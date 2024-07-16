@@ -28,15 +28,11 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.getTourById = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
-	const tourQuery = await Tour.findById(id);
+	const tour = await Tour.findById(id);
 
-	if (!tourQuery) {
+	if (!tour) {
 		return next(new AppError('No tour found with that ID', 404));
 	}
-
-	const apiFeatures = new APIFeatures(tourQuery, req.query).limitFields();
-
-	const tour = await apiFeatures.tourQuery;
 
 	res.status(200).json({
 		status: 'success',
