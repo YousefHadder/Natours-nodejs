@@ -3,6 +3,7 @@ const { promisify } = require('util');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+
 const signToken = (id) =>
 	jwt.sign({ id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRES_IN,
@@ -92,3 +93,18 @@ exports.protect = catchAsync(async (req, res, next) => {
 	req.user = currUser;
 	next();
 });
+
+exports.restrictTo = (...roles) => {
+	return (req, res, next) => {
+		// Check if the role in req is in ['admin, 'lead-guide']
+		if (!roles.includes(req.user.role)) {
+			return next(
+				new AppError(
+					'You do not have permission to perform this action',
+					403, // Forbidden
+				),
+			);
+		}
+		next();
+	};
+};
