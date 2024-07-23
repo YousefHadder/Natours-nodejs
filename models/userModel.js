@@ -16,6 +16,11 @@ const userSchema = mongoose.Schema({
 		validate: [validator.isEmail, 'Please enter a valid email'],
 	},
 	photo: String,
+	active: {
+		type: Boolean,
+		default: true,
+		select: false,
+	},
 	role: {
 		type: String,
 		enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -63,6 +68,12 @@ userSchema.pre('save', function (next) {
 	}
 	this.passwordChangedAt = Date.now() - 1000;
 
+	next();
+});
+
+userSchema.pre(/^find/, function (next) {
+	// (this) points to the current query
+	this.find({ active: { $ne: false } });
 	next();
 });
 
