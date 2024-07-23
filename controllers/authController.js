@@ -6,6 +6,9 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
+const MAX_LOGIN_ATTEMPTS = 3;
+const LOCK_TIME = 120000;
+
 const signToken = (id) =>
 	jwt.sign({ id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRES_IN,
@@ -63,16 +66,56 @@ exports.login = catchAsync(async (req, res, next) => {
 		return next(new AppError('Please provide email and password', 400));
 	}
 
-	// 2) Check if user exists and password is correct
+	// 2) Check if user exists
 	const user = await User.findOne({ email }).select('+password');
+
+	if (!user) {
+		return next(
+			new AppError(
+				'Account not found, please enter a correct email',
+				401,
+			),
+		);
+	}
+
+	// 3) Check if the account is not locked
+	if (user.lockUntil && user.lockUntil > Date.now()) {
+		return next(
+			new AppError(
+				'Account is temporarily locked. Please try again later.',
+				423,
+			),
+		);
+	}
+
 	const correctPassword = await user?.correctPassword(
 		password,
 		user?.password,
 	);
-	if (!user || !correctPassword) {
-		return next(new AppError('Incorrect email or password', 401));
+
+	// 4) Check if password is correct, if not update login attempts
+	// and lock the account if necessary
+
+	if (correctPassword) {
+		user.loginAttempts = 0;
+		user.lockUntil = undefined;
+	} else {
+		user.loginAttempts += 1;
+
+		let message = `Incorrect email or password, you have ${MAX_LOGIN_ATTEMPTS - user.loginAttempts} attempts left`;
+
+		if (user.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+			user.lockUntil = Date.now() + LOCK_TIME;
+			user.loginAttempts = 0;
+			message = 'Account is temporarily locked. Please try again later.';
+		}
+
+		await user.save({ validateBeforeSave: false });
+
+		return next(new AppError(message, 401));
 	}
-	// 3) If everything is ok, send token to the client
+
+	// 5) If everything is ok, send token to the client
 	createSendToken(user, 200, res);
 });
 

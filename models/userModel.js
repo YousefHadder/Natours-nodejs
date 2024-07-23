@@ -46,6 +46,12 @@ const userSchema = mongoose.Schema({
 	passwordChangedAt: Date,
 	passwordResetToken: String,
 	passwordResetExpires: Date,
+	loginAttempts: {
+		type: Number,
+		required: true,
+		default: 0,
+	},
+	lockUntil: { type: Date, default: null },
 });
 
 userSchema.pre(
