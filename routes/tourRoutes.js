@@ -10,11 +10,14 @@ const {
 	getMonthlyPlan,
 } = require('../controllers/tourController');
 const { protect, restrictTo } = require('../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
-// Tour routes
+// Mount the review routes under the tour route
+router.use('/:tourId/reviews', reviewRouter);
 
+// Tour routes
 router.route('/').get(protect, getAllTours).post(createTour);
 
 router.route('/top-5-cheap').get(aliasTop5Tours, getAllTours);
