@@ -1,6 +1,6 @@
 class APIFeatures {
-	constructor(tourQuery, reqQuery) {
-		this.tourQuery = tourQuery;
+	constructor(docQuery, reqQuery) {
+		this.docQuery = docQuery;
 		this.reqQuery = reqQuery;
 	}
 
@@ -31,7 +31,7 @@ class APIFeatures {
 		// Remove backslashes
 		queryStr = queryStr.replace(/\\/g, '');
 
-		this.tourQuery = this.tourQuery.find(JSON.parse(queryStr));
+		this.docQuery = this.docQuery.find(JSON.parse(queryStr));
 		return this;
 	}
 
@@ -40,7 +40,7 @@ class APIFeatures {
 			? this.reqQuery.sort.split(',').join(' ')
 			: '-createdAt';
 
-		this.tourQuery = this.tourQuery.sort(sortBy);
+		this.docQuery = this.docQuery.sort(sortBy);
 		return this;
 	}
 
@@ -48,7 +48,7 @@ class APIFeatures {
 		const fields = this.reqQuery.fields
 			? this.reqQuery.fields.split(',').join(' ')
 			: '-__v';
-		this.tourQuery = this.tourQuery.select(fields);
+		this.docQuery = this.docQuery.select(fields);
 		return this;
 	}
 
@@ -57,7 +57,7 @@ class APIFeatures {
 		const limit = Number(this.reqQuery.limit) || 10;
 		const skip = (page - 1) * limit;
 
-		this.tourQuery = this.tourQuery.skip(skip).limit(limit);
+		this.docQuery = this.docQuery.skip(skip).limit(limit);
 		return this;
 	}
 }

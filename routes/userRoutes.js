@@ -11,6 +11,9 @@ const {
 	getAllUsers,
 	updateMe,
 	deleteMe,
+	getUserById,
+	updateUserById,
+	deleteUserById,
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -25,4 +28,9 @@ router.delete('/deleteMe', protect, deleteMe);
 
 router.route('/').get(getAllUsers);
 
+router
+	.route('/:id')
+	.get(protect, getUserById)
+	.patch(protect, updateUserById)
+	.delete(protect, deleteUserById);
 module.exports = router;
