@@ -84,6 +84,36 @@ const tourSchema = new mongoose.Schema(
 			default: false,
 			select: false,
 		},
+		startLocation: {
+			// GeoJSON DataType
+			type: {
+				type: String,
+				default: 'Point',
+				enum: ['Point'],
+			},
+			coordinates: [Number],
+			adress: String,
+			description: String,
+		},
+		locations: [
+			{
+				type: {
+					type: String,
+					default: 'Point',
+					enum: ['Point'],
+				},
+				coordinates: [Number],
+				adress: String,
+				description: String,
+				day: Number,
+			},
+		],
+		guides: [
+			{
+				type: mongoose.Schema.ObjectId,
+				ref: 'User',
+			},
+		],
 	},
 	{
 		toJSON: { virtuals: true },
@@ -102,6 +132,7 @@ tourSchema.pre('save', function (next) {
 	this.slug = slugify(this.name, { lower: true });
 	next();
 });
+
 tourSchema.post('save', async function (doc, next) {
 	console.log(
 		`New tour is created in ${Date.now() - doc.start} milliseconds`,
@@ -116,6 +147,17 @@ tourSchema.pre(/^find/, function (next) {
 	this.start = Date.now();
 	next();
 });
+
+// Populate guides in the response
+tourSchema.pre(/^find/, function (next) {
+	this.populate({
+		path: 'guides',
+		select: '-__v -passwordChangedAt -loginAttempts -lockUntil',
+	});
+	next();
+});
+
+// Log query execution time
 tourSchema.post(/^find/, function (docs, next) {
 	console.log(`Query executed in ${Date.now() - this.start} milliseconds`);
 	next();
