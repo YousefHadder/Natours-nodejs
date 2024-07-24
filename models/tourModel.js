@@ -117,8 +117,19 @@ const tourSchema = new mongoose.Schema(
 	},
 	{
 		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
 	},
 );
+
+// Virtual Populate Tour and User in a Review response
+tourSchema.virtual('reviews', {
+	ref: 'Review',
+	foreignField: 'tour',
+	localField: '_id',
+	options: {
+		select: '-tour', // Exclude the specific field
+	},
+});
 
 tourSchema.virtual('durationWeeks').get(function () {
 	return this.duration / 7;
