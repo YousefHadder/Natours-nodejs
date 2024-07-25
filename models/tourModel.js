@@ -121,6 +121,9 @@ const tourSchema = new mongoose.Schema(
 	},
 );
 
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // Virtual Populate Tour and User in a Review response
 tourSchema.virtual('reviews', {
 	ref: 'Review',

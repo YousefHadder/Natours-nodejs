@@ -70,6 +70,7 @@ exports.getAll = (Model) =>
 			.sort()
 			.limitFields()
 			.pagination();
+
 		// 5) Execute the query
 		const doc = await apiFeatures.docQuery;
 
