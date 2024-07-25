@@ -6,9 +6,6 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
-const MAX_LOGIN_ATTEMPTS = 3;
-const LOCK_TIME = 120000;
-
 const signToken = (id) =>
 	jwt.sign({ id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRES_IN,
@@ -102,10 +99,10 @@ exports.login = catchAsync(async (req, res, next) => {
 	} else {
 		user.loginAttempts += 1;
 
-		let message = `Incorrect email or password, you have ${MAX_LOGIN_ATTEMPTS - user.loginAttempts} attempts left`;
+		let message = `Incorrect email or password, you have ${process.env.MAX_LOGIN_ATTEMPTS - user.loginAttempts} attempts left`;
 
-		if (user.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-			user.lockUntil = Date.now() + LOCK_TIME;
+		if (user.loginAttempts >= process.env.MAX_LOGIN_ATTEMPTS) {
+			user.lockUntil = Date.now() + process.env.LOCK_TIME;
 			user.loginAttempts = 0;
 			message = 'Account is temporarily locked. Please try again later.';
 		}
