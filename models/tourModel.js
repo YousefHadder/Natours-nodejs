@@ -38,6 +38,7 @@ const tourSchema = new mongoose.Schema(
 			default: 4.5,
 			min: [1, 'Rating must be between 1 and 5'],
 			max: [5, 'Rating must be between 1 and 5'],
+			set: (val) => Math.round(val * 10) / 10.0,
 		},
 		ratingsQuantity: {
 			type: Number,
@@ -129,9 +130,6 @@ tourSchema.virtual('reviews', {
 	ref: 'Review',
 	foreignField: 'tour',
 	localField: '_id',
-	options: {
-		select: '-tour', // Exclude the specific field
-	},
 });
 
 tourSchema.virtual('durationWeeks').get(function () {
@@ -180,16 +178,17 @@ tourSchema.post(/^find/, function (docs, next) {
 // 3) Aggregation Middleware
 
 // Hide secret tours from stats response
-tourSchema.pre('aggregate', function (next) {
-	this.pipeline().unshift({
-		$match: {
-			secretTour: {
-				$ne: true,
-			},
-		},
-	});
-	next();
-});
+// tourSchema.pre('aggregate', function (next) {
+// 	this.pipeline().unshift({
+// 		$match: {
+// 			secretTour: {
+// 				$ne: true,
+// 			},
+// 		},
+// 	});
+// 	console.log(this.pipeline());
+// 	next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
