@@ -32,7 +32,6 @@ bower_components/
 .idea/
 .vscode/
 dev-data/
-public/
 *.suo
 *.ntvs*
 *.njsproj
