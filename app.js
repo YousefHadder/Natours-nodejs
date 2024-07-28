@@ -2,21 +2,27 @@ const hpp = require('hpp');
 const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const viewRouter = require('./routes/viewRoutes');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
+// Tell Express to use Pug (Jade) templating engine
 app.set('view engine', 'pug');
+
+// Tell Express to use the 'views' directory for templates
+// Use path module to avoid mistakes like forgetting to add / to the directory
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) Global Middlewares
@@ -28,16 +34,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
 	helmet.contentSecurityPolicy({
 		directives: {
-			defaultSrc: ["'self'"],
-			scriptSrc: ["'self'", 'https://api.mapbox.com'],
-			workerSrc: ["'self'", 'blob:'],
+			defaultSrc: ["'self'", 'https://*.mapbox.com'],
+			connectSrc: ["'self'", 'ws://127.0.0.1:62945'],
 		},
 	}),
 );
-
 // Development logging middleware (development only)
 if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
+
+	app.use((req, res, next) => {
+		res.setHeader(
+			'Content-Security-Policy',
+			"default-src 'self' https://*.mapbox.com; connect-src 'self' ws://127.0.0.1:*;",
+		);
+		next();
+	});
 }
 
 const limiter = rateLimit({
@@ -51,6 +63,7 @@ app.use('/api', limiter);
 
 // Body Parser middleware
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -71,6 +84,11 @@ app.use(
 		],
 	}),
 );
+
+app.use((req, res, next) => {
+	req.requestTime = new Date().toISOString();
+	next();
+});
 
 // Route Handlers
 app.use('/', viewRouter);

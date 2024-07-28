@@ -19,32 +19,65 @@ const handleJWTError = () =>
 	new AppError('Invalid token. Please log in again', 401);
 const handleJWTTokenExpiredError = () =>
 	new AppError('Token expired. Please log in again', 401);
-const sendDevError = (err, res) => {
-	res.status(err.statusCode).json({
-		status: err.status,
-		message: err.message,
-		stack: err.stack,
-		error: err,
-	});
-};
-const sendProdError = (err, res) => {
-	// operational, trusted errors.
-	if (err.isOperational) {
-		res.status(err.statusCode).json({
+
+const sendDevError = (err, req, res) => {
+	// API
+	if (req.originalUrl.startsWith('/api')) {
+		return res.status(err.statusCode).json({
 			status: err.status,
 			message: err.message,
+			stack: err.stack,
+			error: err,
 		});
-	} else {
+	}
+	// RENDERED WEBSITE
+	// non-operational, untrusted errors.
+	console.error(`Error:${err}`);
+	return res.status(err.statusCode).render('error', {
+		title: 'Something went wrong!',
+		msg: err.message,
+	});
+};
+
+const sendProdError = (err, req, res) => {
+	// A) API
+	if (req.originalUrl.startsWith('/api')) {
+		// operational, trusted errors.
+		if (err.isOperational) {
+			return res.status(err.statusCode).json({
+				status: err.status,
+				message: err.message,
+			});
+		}
+
 		// programming or other unknown error: don't leak error details
 		// 1) Log Error
 		console.error(`Error:${err}`);
 
 		// 2) Send generic message
-		res.status(500).json({
+		return res.status(500).json({
 			status: 'error',
 			message: 'Something went wrong!',
 		});
 	}
+
+	// B) RENDERED WEBSITE
+	if (err.isOperational) {
+		return res.status(err.statusCode).render('error', {
+			title: 'Something went wrong!',
+			msg: err.message,
+		});
+	}
+
+	// programming or other unknown error: don't leak error details
+	// 1) Log Error
+	console.error(`Error:${err}`);
+
+	// 2) Send generic message
+	return res.status(err.statusCode).render('error', {
+		title: 'Something went wrong!',
+		msg: 'Please try again later.',
+	});
 };
 
 module.exports = (err, req, res, next) => {
@@ -52,7 +85,7 @@ module.exports = (err, req, res, next) => {
 	err.status = err.status || 'error';
 
 	if (process.env.NODE_ENV === 'development') {
-		sendDevError(err, res);
+		sendDevError(err, req, res);
 	} else if (process.env.NODE_ENV === 'production') {
 		let errObj = Object.create(err);
 
@@ -71,6 +104,6 @@ module.exports = (err, req, res, next) => {
 		if (errObj.name === 'TokenExpiredError') {
 			errObj = handleJWTTokenExpiredError(errObj);
 		}
-		sendProdError(errObj, res);
+		sendProdError(errObj, req, res);
 	}
 };

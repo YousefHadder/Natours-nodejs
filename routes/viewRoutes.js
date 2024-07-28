@@ -2,7 +2,9 @@ const express = require('express');
 const {
 	getOverviewPage,
 	getTourPage,
+	getLoginForm,
 } = require('../controllers/viewController');
+const { protect, isLoggedIn } = require('../controllers/authController');
 
 const CSP = 'Content-Security-Policy';
 const POLICY =
@@ -23,7 +25,10 @@ router.use((req, res, next) => {
 	next();
 });
 
+router.use(isLoggedIn);
+
 router.get('/', getOverviewPage);
-router.get('/tours/:slug', getTourPage);
+router.get('/tours/:slug', protect, getTourPage);
+router.get('/login', getLoginForm);
 
 module.exports = router;

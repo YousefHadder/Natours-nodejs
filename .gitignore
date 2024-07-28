@@ -44,3 +44,10 @@ config.env
 # Build directories
 dist/
 build/
+public/overview.html
+public/tour.html
+
+# Cache folders
+.cache
+public/js/bundle.js
+public/js/bundle.js.map

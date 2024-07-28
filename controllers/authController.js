@@ -87,7 +87,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
 	const correctPassword = await user?.correctPassword(
 		password,
-		user?.password,
+		user.password,
 	);
 
 	// 4) Check if password is correct, if not update login attempts
@@ -95,14 +95,15 @@ exports.login = catchAsync(async (req, res, next) => {
 
 	if (correctPassword) {
 		user.loginAttempts = 0;
-		user.lockUntil = undefined;
+		user.lockUntil = null;
+		await user.save({ validateBeforeSave: false });
 	} else {
 		user.loginAttempts += 1;
 
 		let message = `Incorrect email or password, you have ${process.env.MAX_LOGIN_ATTEMPTS - user.loginAttempts} attempts left`;
 
-		if (user.loginAttempts >= process.env.MAX_LOGIN_ATTEMPTS) {
-			user.lockUntil = Date.now() + process.env.LOCK_TIME;
+		if (user.loginAttempts >= process.env.MAX_LOGIN_ATTEMPTS * 1) {
+			user.lockUntil = Date.now() + process.env.LOCK_TIME * 1;
 			user.loginAttempts = 0;
 			message = 'Account is temporarily locked. Please try again later.';
 		}
@@ -116,12 +117,22 @@ exports.login = catchAsync(async (req, res, next) => {
 	createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+	res.cookie('jwt', 'loggedout', { expires: new Date(0), httpOnly: true });
+	res.status(200).json({
+		status: 'success',
+		message: 'Logged out successfully',
+	});
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
 	// 1) Getting token and chek if it's there
 	const { authorization } = req.headers;
 	let token = '';
 	if (authorization && authorization.startsWith('Bearer')) {
 		token = authorization.split(' ')[1];
+	} else if (req.cookies?.jwt) {
+		token = req.cookies.jwt;
 	}
 	if (!token) {
 		return next(new AppError('You are not logged in', 401));
@@ -146,6 +157,34 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 	// 5) If all above checks pass, grant access to the route
 	req.user = currUser;
+	next();
+});
+
+// Only for rendered pages, no errors!
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+	if (req.cookies?.jwt) {
+		// 1) Verifiy token
+		const decoded = await promisify(jwt.verify)(
+			req.cookies.jwt,
+			process.env.JWT_SECRET,
+		);
+
+		const { id } = decoded;
+
+		// 2) Check if user exists and is not deleted
+		const currUser = await User.findById(id);
+		if (!currUser) {
+			return next();
+		}
+
+		// 3) Check if user has changed passowrd after token was issued
+		if (currUser.changedPasswordAfter(decoded.iat)) {
+			return next();
+		}
+
+		// THERE IS A LOGGED IN USER
+		res.locals.user = currUser;
+	}
 	next();
 });
 
