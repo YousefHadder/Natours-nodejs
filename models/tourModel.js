@@ -175,21 +175,6 @@ tourSchema.post(/^find/, function (docs, next) {
 	next();
 });
 
-// 3) Aggregation Middleware
-
-// Hide secret tours from stats response
-// tourSchema.pre('aggregate', function (next) {
-// 	this.pipeline().unshift({
-// 		$match: {
-// 			secretTour: {
-// 				$ne: true,
-// 			},
-// 		},
-// 	});
-// 	console.log(this.pipeline());
-// 	next();
-// });
-
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;

@@ -3,6 +3,8 @@ const {
 	getOverviewPage,
 	getTourPage,
 	getLoginForm,
+	getAccount,
+	updateUserData,
 } = require('../controllers/viewController');
 const { protect, isLoggedIn } = require('../controllers/authController');
 
@@ -25,10 +27,10 @@ router.use((req, res, next) => {
 	next();
 });
 
-router.use(isLoggedIn);
-
-router.get('/', getOverviewPage);
-router.get('/tours/:slug', protect, getTourPage);
-router.get('/login', getLoginForm);
+router.get('/', isLoggedIn, getOverviewPage);
+router.get('/tours/:slug', isLoggedIn, getTourPage);
+router.get('/login', isLoggedIn, getLoginForm);
+router.get('/me', protect, getAccount);
+router.post('/submit-user-data', protect, updateUserData);
 
 module.exports = router;

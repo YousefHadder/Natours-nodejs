@@ -9,8 +9,8 @@ const filterObj = (obj, ...allowedFields) => {
 		if (allowedFields.includes(el)) {
 			newObj[el] = obj[el];
 		}
-		return newObj;
 	});
+	return newObj;
 };
 
 exports.getMe = (req, res, next) => {
@@ -27,12 +27,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 			),
 		);
 	}
-
 	// Don't pass req.body, because it might contain fields
 	//that are not allowed to be updated such as role, or token.
 	// 2) filter the fields to be updated using only allowedFields
 	const filteredBody = filterObj(req.body, 'name', 'email', 'photo');
-
 	// Cannot use findById then .save() because
 	// required fields won't be validated.
 	// 3) update user document

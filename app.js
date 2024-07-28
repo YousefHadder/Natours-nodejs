@@ -18,6 +18,12 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
+const limiter = rateLimit({
+	max: 100,
+	windowMs: 60 * 60 * 1000, // 1 hour
+	message: 'Too many requests from this IP, please try again in an hour!',
+});
+
 // Tell Express to use Pug (Jade) templating engine
 app.set('view engine', 'pug');
 
@@ -52,17 +58,12 @@ if (process.env.NODE_ENV === 'development') {
 	});
 }
 
-const limiter = rateLimit({
-	max: 100,
-	windowMs: 60 * 60 * 1000, // 1 hour
-	message: 'Too many requests from this IP, please try again in an hour!',
-});
-
 // Limit requests from same IP
 app.use('/api', limiter);
 
-// Body Parser middleware
+// Body Parser middlewares
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data Sanitization against NoSQL query injection
