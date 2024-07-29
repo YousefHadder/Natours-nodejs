@@ -2,10 +2,12 @@
 import '@babel/polyfill';
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
+import { signup } from './signup.js';
 import { updateSettings } from './updateSettings.js';
 // DOM ELEMENTS
 const mapbox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
+const signupForm = document.querySelector('.form--signup');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
@@ -25,20 +27,27 @@ loginForm?.addEventListener('submit', (e) => {
 	login(email, password);
 });
 
+signupForm?.addEventListener('submit', (e) => {
+	e.preventDefault();
+	const name = document.getElementById('name').value;
+	const email = document.getElementById('email').value;
+	const password = document.getElementById('password').value;
+	const passwordConfirm = document.getElementById('passwordConfirm').value;
+	signup(name, email, password, passwordConfirm);
+});
+
 logoutBtn?.addEventListener('click', (e) => {
 	e.preventDefault();
 	logout();
 });
 
-userDataForm?.addEventListener('submit', (e) => {
+userDataForm?.addEventListener('submit', async (e) => {
 	e.preventDefault();
-
 	const form = new FormData();
 	form.append('name', document.getElementById('name').value);
 	form.append('email', document.getElementById('email').value);
 	form.append('photo', document.getElementById('photo').files[0]);
-
-	updateSettings(form, 'data');
+	await updateSettings(form, 'data');
 });
 
 passwordForm?.addEventListener('submit', async (e) => {

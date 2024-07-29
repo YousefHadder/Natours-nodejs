@@ -8,7 +8,7 @@ module.exports = class Email {
 		this.to = user.email;
 		this.name = user.name.split(' ')[0];
 		this.url = url;
-		this.from = `Yousef Hadder <${process.env.EMAIL_FROM}>`;
+		this.from = `Yousef Hadder <${process.env.MAILTRAP_FROM}>`;
 	}
 
 	newTransport() {
@@ -25,12 +25,13 @@ module.exports = class Email {
 				},
 			});
 		}
+		// Using mailtrap for development
 		return nodemailer.createTransport({
-			host: process.env.EMAIL_HOST,
-			port: process.env.EMAIL_PORT,
+			host: process.env.MAILTRAP_HOST,
+			port: process.env.MAILTRAP_PORT,
 			auth: {
-				user: process.env.EMAIL_USERNAME,
-				pass: process.env.EMAIL_PASSWORD,
+				user: process.env.MAILTRAP_USERNAME,
+				pass: process.env.MAILTRAP_PASSWORD,
 			},
 		});
 	}

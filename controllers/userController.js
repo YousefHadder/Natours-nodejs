@@ -34,6 +34,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 		.toFormat('jpeg')
 		.jpeg({ quality: 90 })
 		.toFile(`public/img/users/${req.file.filename}`);
+	next();
 });
 
 const filterObj = (obj, ...allowedFields) => {

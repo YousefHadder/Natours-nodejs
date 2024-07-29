@@ -5,6 +5,7 @@ const {
 	getLoginForm,
 	getAccount,
 	updateUserData,
+	getSignupForm,
 } = require('../controllers/viewController');
 const { protect, isLoggedIn } = require('../controllers/authController');
 
@@ -30,6 +31,7 @@ router.use((req, res, next) => {
 router.get('/', isLoggedIn, getOverviewPage);
 router.get('/tours/:slug', isLoggedIn, getTourPage);
 router.get('/login', isLoggedIn, getLoginForm);
+router.get('/signup', isLoggedIn, getSignupForm);
 router.get('/me', protect, getAccount);
 router.post('/submit-user-data', protect, updateUserData);
 
