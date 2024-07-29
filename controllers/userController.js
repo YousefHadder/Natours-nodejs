@@ -95,11 +95,6 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 	});
 });
 
-exports.getAllUsers = factory.getAll(User);
-exports.getUserById = factory.getOne(User);
-exports.updateUserById = factory.updateOne(User); // Do Not update passwords with this, this route is for admins.
-exports.deleteUserById = factory.deleteOne(User);
-
 exports.createUser = (req, res, next) => {
 	res.status(500).json({
 		status: 'error',
@@ -107,3 +102,8 @@ exports.createUser = (req, res, next) => {
 			'This route is not for creating users. Please use /signup instead.',
 	});
 };
+
+exports.getAllUsers = factory.getAll(User);
+exports.getUserById = factory.getOne(User);
+exports.updateUserById = factory.updateOne(User); // Do Not update passwords with this, this route is for admins.
+exports.deleteUserById = factory.deleteOne(User);

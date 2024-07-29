@@ -40,7 +40,7 @@ exports.getLoginForm = (req, res) => {
 
 exports.getAccount = (req, res) => {
 	res.status(200).render('account', {
-		title: 'Yousr Account',
+		title: 'Your Account',
 	});
 };
 
