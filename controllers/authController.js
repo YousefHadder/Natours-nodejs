@@ -118,7 +118,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = (req, res) => {
-	res.cookie('jwt', 'loggedout', { expires: new Date(0), httpOnly: true });
+	res.cookie('jwt', 'loggedOut', { expires: new Date(0), httpOnly: true });
 	res.status(200).json({
 		status: 'success',
 		message: 'Logged out successfully',
@@ -126,7 +126,7 @@ exports.logout = (req, res) => {
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
-	// 1) Getting token and chek if it's there
+	// 1) Getting token and check if it's there
 	const { authorization } = req.headers;
 	let token = '';
 	if (authorization && authorization.startsWith('Bearer')) {
@@ -138,7 +138,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 		return next(new AppError('You are not logged in', 401));
 	}
 
-	// 2) Verifiy token
+	// 2) Verify token
 	const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 	const { id } = decoded;
 
@@ -148,7 +148,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 		return next(new AppError('User no longer exists', 401));
 	}
 
-	// 4) Check if user has changed passowrd after token was issued
+	// 4) Check if user has changed password after token was issued
 	if (currUser.changedPasswordAfter(decoded.iat)) {
 		return next(
 			new AppError('Password recently changed. Please log in again', 401),
@@ -164,7 +164,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 // Only for rendered pages, no errors!
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
 	if (req.cookies?.jwt) {
-		// 1) Verifiy token
+		// 1) Verify token
 		const decoded = await promisify(jwt.verify)(
 			req.cookies.jwt,
 			process.env.JWT_SECRET,
@@ -178,7 +178,7 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
 			return next();
 		}
 
-		// 3) Check if user has changed passowrd after token was issued
+		// 3) Check if user has changed password after token was issued
 		if (currUser.changedPasswordAfter(decoded.iat)) {
 			return next();
 		}

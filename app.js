@@ -24,7 +24,7 @@ const limiter = rateLimit({
 	message: 'Too many requests from this IP, please try again in an hour!',
 });
 
-// Tell Express to use Pug (Jade) templating engine
+// Tell Express to use Pug (Jade) tempting engine
 app.set('view engine', 'pug');
 
 // Tell Express to use the 'views' directory for templates

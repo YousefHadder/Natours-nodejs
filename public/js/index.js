@@ -8,7 +8,7 @@ const mapbox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
-const passowrdForm = document.querySelector('.form-user-password');
+const passwordForm = document.querySelector('.form-user-password');
 
 // DELEGATION
 if (mapbox) {
@@ -41,7 +41,7 @@ userDataForm?.addEventListener('submit', (e) => {
 	updateSettings(form, 'data');
 });
 
-passowrdForm?.addEventListener('submit', async (e) => {
+passwordForm?.addEventListener('submit', async (e) => {
 	e.preventDefault();
 	document.querySelector('.btn--save-password').textContent = 'Updating...';
 
