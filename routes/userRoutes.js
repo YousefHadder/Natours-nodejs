@@ -19,6 +19,7 @@ const {
 	getMe,
 	createUser,
 	uploadUserPhoto,
+	resizeUserPhoto,
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -34,7 +35,7 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(protect);
 
 router.get('/me', getMe, getUserById);
-router.patch('/updateMe', uploadUserPhoto, updateMe);
+router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe);
 router.patch('/updateMyPassword', updatePassword);
 router.delete('/deleteMe', deleteMe);
 
