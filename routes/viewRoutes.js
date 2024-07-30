@@ -6,6 +6,7 @@ const {
 	getAccount,
 	updateUserData,
 	getSignupForm,
+	getMyTours,
 } = require('../controllers/viewController');
 const { protect, isLoggedIn } = require('../controllers/authController');
 const { createBookingCheckout } = require('../controllers/bookingController');
@@ -19,6 +20,7 @@ router.get('/tours/:slug', isLoggedIn, getTourPage);
 router.get('/login', isLoggedIn, getLoginForm);
 router.get('/signup', isLoggedIn, getSignupForm);
 router.get('/me', protect, getAccount);
+router.get('/my-tours', protect, getMyTours);
 router.post('/submit-user-data', protect, updateUserData);
 
 module.exports = router;
