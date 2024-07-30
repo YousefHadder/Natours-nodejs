@@ -4,9 +4,10 @@
 	"description": "First NodeJs project for NodeJs Express Course by Jonas Schmedtmann",
 	"main": "app.js",
 	"scripts": {
+		"start": "node server.js",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "nodemon server.js",
-		"prod": "NODE_ENV=production nodemon server.js",
+		"start:prod": "NODE_ENV=production nodemon server.js",
 		"clean": "rm -rf node_modules package-lock.json && npm install",
 		"watch:js": "esbuild ./public/js/index.js --bundle --outfile=./public/js/bundle.js --loader:.png=dataurl --watch",
 		"build:js": "esbuild ./public/js/index.js --bundle --outfile=./public/js/bundle.js --loader:.png=dataurl --minify --sourcemap --define:process.env.NODE_ENV='\"production\"'"
