@@ -9,7 +9,7 @@
 		"prod": "NODE_ENV=production nodemon server.js",
 		"clean": "rm -rf node_modules package-lock.json && npm install",
 		"watch:js": "esbuild ./public/js/index.js --bundle --outfile=./public/js/bundle.js --loader:.png=dataurl --watch",
-		"build:js": "esbuild ./public/js/index.js --bundle --outfile=./public/js/bundle.js --loader:.png=dataurl --watch"
+		"build:js": "esbuild ./public/js/index.js --bundle --outfile=./public/js/bundle.js --loader:.png=dataurl --minify --sourcemap --define:process.env.NODE_ENV='\"production\"'"
 	},
 	"keywords": [],
 	"author": "Yousef Y Hadder",
@@ -20,6 +20,7 @@
 		"@eslint/eslintrc": "^3.1.0",
 		"@eslint/js": "^9.6.0",
 		"bcryptjs": "^2.4.3",
+		"compression": "^1.7.4",
 		"cookie-parser": "^1.4.6",
 		"dotenv": "^16.4.5",
 		"esbuild": "0.23.0",

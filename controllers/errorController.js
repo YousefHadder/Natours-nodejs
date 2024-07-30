@@ -32,7 +32,7 @@ const sendDevError = (err, req, res) => {
 	}
 	// RENDERED WEBSITE
 	// non-operational, untrusted errors.
-	console.error(`Error:${err}`);
+	console.error(`Error: ${err}`);
 	return res.status(err.statusCode).render('error', {
 		title: 'Something went wrong!',
 		msg: err.message,
@@ -52,7 +52,7 @@ const sendProdError = (err, req, res) => {
 
 		// programming or other unknown error: don't leak error details
 		// 1) Log Error
-		console.error(`Error:${err}`);
+		console.error(`Error: ${err}`);
 
 		// 2) Send generic message
 		return res.status(500).json({
@@ -71,7 +71,7 @@ const sendProdError = (err, req, res) => {
 
 	// programming or other unknown error: don't leak error details
 	// 1) Log Error
-	console.error(`Error:${err}`);
+	console.error(`Error: ${err}`);
 
 	// 2) Send generic message
 	return res.status(err.statusCode).render('error', {

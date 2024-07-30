@@ -140,15 +140,8 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 // runs before save and create commands, but not insert Many
 tourSchema.pre('save', function (next) {
-	this.start = Date.now();
 	this.slug = slugify(this.name, { lower: true });
 	next();
-});
-
-tourSchema.post('save', async function (doc, next) {
-	console.log(
-		`New tour is created in ${Date.now() - doc.start} milliseconds`,
-	);
 });
 
 // 2) Query Middleware
@@ -170,10 +163,6 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // Log query execution time
-tourSchema.post(/^find/, function (docs, next) {
-	console.log(`Query executed in ${Date.now() - this.start} milliseconds`);
-	next();
-});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
