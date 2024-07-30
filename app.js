@@ -12,6 +12,7 @@ const viewRouter = require('./routes/viewRoutes');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -38,24 +39,37 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set Security HTTP headers
 app.use(
-	helmet.contentSecurityPolicy({
-		directives: {
-			defaultSrc: ["'self'", 'https://*.mapbox.com'],
-			connectSrc: ["'self'", 'ws://127.0.0.1:62945'],
+	helmet({
+		contentSecurityPolicy: {
+			directives: {
+				defaultSrc: ["'self'", 'https://*.mapbox.com'],
+				baseUri: ["'self'"],
+				blockAllMixedContent: [],
+				fontSrc: ["'self'", 'https:', 'data:'],
+				frameAncestors: ["'self'"],
+				imgSrc: ['http://localhost:8000', "'self'", 'blob:', 'data:'],
+				objectSrc: ["'none'"],
+				scriptSrc: [
+					'https:',
+					'cdn.jsdelivr.net',
+					'cdnjs.cloudflare.com',
+					'api.mapbox.com',
+					"'self'",
+					'blob:',
+					'https://js.stripe.com',
+				],
+				scriptSrcAttr: ["'none'"],
+				styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+				upgradeInsecureRequests: [],
+				frameSrc: ["'self'", 'https://js.stripe.com'],
+			},
 		},
 	}),
 );
+
 // Development logging middleware (development only)
 if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
-
-	app.use((req, res, next) => {
-		res.setHeader(
-			'Content-Security-Policy',
-			"default-src 'self' https://*.mapbox.com; connect-src 'self' ws://127.0.0.1:*;",
-		);
-		next();
-	});
 }
 
 // Limit requests from same IP
@@ -96,7 +110,9 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
+// All other unimplemented routes return 404
 app.all('*', (req, res, next) => {
 	next(new AppError(`Cannot find ${req.originalUrl} on this server.`, 404));
 });

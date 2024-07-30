@@ -4,6 +4,8 @@ import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { signup } from './signup.js';
 import { updateSettings } from './updateSettings.js';
+import { bookTour } from './stripe.js';
+
 // DOM ELEMENTS
 const mapbox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
@@ -11,6 +13,7 @@ const signupForm = document.querySelector('.form--signup');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
+const bookBtn = document.getElementById('book-tour');
 
 // DELEGATION
 if (mapbox) {
@@ -67,4 +70,10 @@ passwordForm?.addEventListener('submit', async (e) => {
 	document.getElementById('password-current').value = '';
 	document.getElementById('password').value = '';
 	document.getElementById('password-confirm').value = '';
+});
+
+bookBtn?.addEventListener('click', async (e) => {
+	e.target.textContent = 'Processing...';
+	const { tourId } = e.target.dataset;
+	await bookTour(tourId);
 });

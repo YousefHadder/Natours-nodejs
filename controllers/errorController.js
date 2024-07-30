@@ -4,14 +4,14 @@ const handleCastErrorDB = (err) => {
 	const message = `Invalid ${err.path}: ${err.value}`;
 	return new AppError(message, 400);
 };
-const handleDublicateFieldDB = (err) => {
-	const message = `Duplicate field value: '${err.errmsg.match(/(?<=")[^"]*(?=")/g)}' already exists`;
+const handleDuplicateFieldDB = (err) => {
+	const message = `'${err.errmsg.match(/(?<=")[^"]*(?=")/g)}' already exists`;
 	return new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err) => {
 	const errors = Object.values(err.errors).map((el) => el.message);
-	const message = `Invalid input data. [${errors.join('. ')}]`;
+	const message = `Invalid input data. ${errors.join('. ')}`;
 	return new AppError(message, 400);
 };
 
@@ -93,7 +93,7 @@ module.exports = (err, req, res, next) => {
 			errObj = handleCastErrorDB(errObj);
 		}
 		if (errObj.code === 11000) {
-			errObj = handleDublicateFieldDB(errObj);
+			errObj = handleDuplicateFieldDB(errObj);
 		}
 		if (errObj.name === 'ValidationError') {
 			errObj = handleValidationErrorDB(errObj);
