@@ -18,6 +18,7 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+const { webhookCheckout } = require('./controllers/bookingController');
 
 const app = express();
 
@@ -88,6 +89,15 @@ if (process.env.NODE_ENV === 'development') {
 
 // Limit requests from same IP
 app.use('/api', limiter);
+
+// We add the webhook route here and not in the booking router
+// the stripe function we will use to read the body of the request
+// needs this body in a raw form, so we add it before the json body parser
+app.post(
+	'/webhook-checkout',
+	express.raw({ type: 'application/json' }),
+	webhookCheckout,
+);
 
 // Body Parser middlewares
 app.use(express.json({ limit: '10kb' }));
