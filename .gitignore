@@ -48,4 +48,4 @@ public/*.html
 
 # Cache folders
 .cache
-bundle.js*
+bundle.js.map
