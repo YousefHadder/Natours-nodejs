@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
+const cors = require('cors');
 
 const viewRouter = require('./routes/viewRoutes');
 const tourRouter = require('./routes/tourRoutes');
@@ -35,7 +36,17 @@ app.set('view engine', 'pug');
 // Use path module to avoid mistakes like forgetting to add / to the directory
 app.set('views', path.join(__dirname, 'views'));
 
-// 1) Global Middlewares
+// 1) GLOBAL MIDDLEWARES
+// Implement CORS
+app.use(cors());
+// Access-Control-Allow-Origin *
+// api.natours.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.natours.com'
+// }))
+
+app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors());
 
 // Serving static files from the 'public' directory (public folder)
 app.use(express.static(path.join(__dirname, 'public')));
