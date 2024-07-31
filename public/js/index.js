@@ -5,6 +5,7 @@ import { login, logout } from './login';
 import { signup } from './signup.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe.js';
+import { showAlert } from './alerts';
 
 // DOM ELEMENTS
 const mapbox = document.getElementById('map');
@@ -77,3 +78,9 @@ bookBtn?.addEventListener('click', async (e) => {
 	const { tourId } = e.target.dataset;
 	await bookTour(tourId);
 });
+
+const alertMessage = document.querySelector('body').dataset.alert;
+
+if (alert) {
+	showAlert('success', alertMessage, 20);
+}
