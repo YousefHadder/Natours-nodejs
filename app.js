@@ -20,6 +20,8 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
+app.enable('trust proxy', true); // For Heroku
+
 const limiter = rateLimit({
 	max: 100,
 	windowMs: 60 * 60 * 1000, // 1 hour
