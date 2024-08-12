@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
 
+const dateSchema = new mongoose.Schema({
+	date: { type: Date, required: true },
+	participants: { type: Number, default: 0 },
+	soldOut: { type: Boolean, default: false },
+});
+
 const tourSchema = new mongoose.Schema(
 	{
 		name: {
@@ -79,7 +85,23 @@ const tourSchema = new mongoose.Schema(
 			default: Date.now,
 			select: false,
 		},
-		startDates: [Date],
+		startDates: {
+			type: [dateSchema],
+			set: function (dates) {
+				// Convert strings or Date objects to the required dateSchema format
+				return dates.map((date) => {
+					if (typeof date === 'string' || date instanceof Date) {
+						return {
+							date: new Date(date),
+							participants: 0, // Default value
+							maxParticipants: 20, // Default value, adjust as needed
+							soldOut: false, // Default value
+						};
+					}
+					return date; // If already in the correct format, leave it as is
+				});
+			},
+		},
 		secretTour: {
 			type: Boolean,
 			default: false,
