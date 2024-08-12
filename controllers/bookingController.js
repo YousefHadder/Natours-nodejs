@@ -8,11 +8,13 @@ const factory = require('./handlerFactory');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 	const { tourId } = req.params;
+	const selectedDate = req.params.selectedDate;
 	// 1) Get the booked tour
 	const tour = await Tour.findById(tourId);
 	if (!tour) {
 		return next(new AppError('No tour found with that ID', 404));
 	}
+
 	// 2) Create a checkout session for the tour
 	const session = await stripe.checkout.sessions.create({
 		payment_method_types: ['card'],
@@ -21,6 +23,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 		customer_email: req.user.email,
 		client_reference_id: req.params.tourId,
 		mode: 'payment',
+		metadata: {
+			selectedDate,
+		},
 		line_items: [
 			{
 				price_data: {
@@ -47,10 +52,22 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 const createBookingCheckout = async (session) => {
-	const tour = session.client_reference_id;
-	const user = (await User.findOne({ email: session.customer_email })).id;
+	const tourId = session.client_reference_id;
+	const userId = (await User.findOne({ email: session.customer_email })).id;
 	const price = session.amount_total / 100;
-	await Booking.create({ tour, user, price });
+	const selectedDate = session.metadata.selectedDate;
+
+	const tour = await Tour.findOne({ _id: tourId });
+	const index = tour.startDates.findIndex(
+		(date) => date.date.toISOString() === selectedDate,
+	);
+	console.log(index);
+	tour.startDates[index].participants++;
+	if (tour.startDates[index].participants >= tour.maxGroupSize) {
+		tour.startDates[index].soldOut = true;
+	}
+	await tour.save();
+	await Booking.create({ tourId, userId, price });
 };
 
 exports.webhookCheckout = (req, res) => {
@@ -60,7 +77,7 @@ exports.webhookCheckout = (req, res) => {
 		event = stripe.webhooks.constructEvent(
 			req.body,
 			signature,
-			process.env.STRIPE_WEBHOOK_SECRET,
+			process.env.STRIPE_WEBHOOK_SECRET_DEV,
 		);
 	} catch (err) {
 		return res.status(400).send(`Webhook error: ${err.message}`);

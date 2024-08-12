@@ -15,7 +15,11 @@ const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
+const tourDateSelect = document.getElementById('tourDate');
 
+if (bookBtn) {
+	bookBtn.disabled = true;
+}
 // DELEGATION
 if (mapbox) {
 	const locations = JSON.parse(
@@ -73,10 +77,19 @@ passwordForm?.addEventListener('submit', async (e) => {
 	document.getElementById('password-confirm').value = '';
 });
 
+tourDateSelect?.addEventListener('change', () => {
+	if (tourDateSelect.value) {
+		bookBtn.disabled = false;
+	} else {
+		bookBtn.disabled = true;
+	}
+});
+
 bookBtn?.addEventListener('click', async (e) => {
 	e.target.textContent = 'Processing...';
 	const { tourId } = e.target.dataset;
-	await bookTour(tourId);
+	const selectedDate = tourDateSelect.value;
+	await bookTour(tourId, selectedDate);
 });
 
 const alertMessage = document.querySelector('body').dataset.alert;

@@ -38,7 +38,7 @@ block content
 			div
 				.overview-box__group
 					h2.heading-secondary.ma-bt-lg Quick facts
-					- const date = tour.startDates[0].toLocaleString('en-us',{month: 'long', year: 'numeric'})
+					- const date = tour.startDates[0].date.toLocaleString('en-us',{month: 'long', year: 'numeric'})
 					+overviewBox('Next date',date,'calendar')
 					+overviewBox('Difficulty',tour.difficulty,'calendar')
 					+overviewBox('Participants',tour.maxGroupSize,'calendar')
@@ -83,6 +83,13 @@ block content
 				h2.heading-secondary What are you waiting for?
 				p.cta__text #{tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
 				if user
-					button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+					.book-tour-container
+						label(for="tourDate") Select a Date:
+						select#tourDate(name="tourDate", required)
+							option(value="" disabled selected) -- Choose a Date --
+							each date in tour.startDates
+								if date.soldOut === false
+									option(value=date.date) #{date.date.toDateString()}
+						button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}` disabled) Book tour now!
 				else 
 					a.btn.btn--green.span-all-rows(href='/login') Log in to book tour now
