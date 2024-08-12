@@ -5,6 +5,7 @@ import { login, logout } from './login';
 import { signup } from './signup.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe.js';
+import { showAlert } from './alerts';
 
 // DOM ELEMENTS
 const mapbox = document.getElementById('map');
@@ -90,3 +91,9 @@ bookBtn?.addEventListener('click', async (e) => {
 	const selectedDate = tourDateSelect.value;
 	await bookTour(tourId, selectedDate);
 });
+
+const alertMessage = document.querySelector('body').dataset.alert;
+
+if (alertMessage) {
+	showAlert('success', alertMessage, 10);
+}

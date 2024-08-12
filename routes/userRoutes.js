@@ -21,9 +21,11 @@ const {
 	uploadUserPhoto,
 	resizeUserPhoto,
 } = require('../controllers/userController');
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
 
+router.use('/:userId/bookings', bookingRouter);
 // User authentication routes
 router.post('/signup', signup);
 router.post('/login', login);

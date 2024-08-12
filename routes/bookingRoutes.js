@@ -9,7 +9,7 @@ const {
 	deleteBookingById,
 } = require('../controllers/bookingController');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use(protect);
 

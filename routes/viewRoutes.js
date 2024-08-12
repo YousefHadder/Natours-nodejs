@@ -7,11 +7,13 @@ const {
 	updateUserData,
 	getSignupForm,
 	getMyTours,
+	alerts,
 } = require('../controllers/viewController');
 const { protect, isLoggedIn } = require('../controllers/authController');
 
 const router = express.Router();
 
+router.use(alerts);
 // We add createBookingCheckout here because we create a booking in the database
 // right before redirecting to the path / .
 router.get('/', isLoggedIn, getOverviewPage);
