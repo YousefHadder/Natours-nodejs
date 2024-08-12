@@ -84,12 +84,11 @@ block content
 				p.cta__text #{tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
 				if user
 					.book-tour-container
-						label(for="tourDate") Select a Date:
+						button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}` disabled) Book tour now!
 						select#tourDate(name="tourDate", required)
 							option(value="" disabled selected) -- Choose a Date --
 							each date in tour.startDates
 								if date.soldOut === false
 									option(value=date.date) #{date.date.toDateString()}
-						button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}` disabled) Book tour now!
 				else 
 					a.btn.btn--green.span-all-rows(href='/login') Log in to book tour now

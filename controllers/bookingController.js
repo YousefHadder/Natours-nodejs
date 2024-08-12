@@ -55,19 +55,20 @@ const createBookingCheckout = async (session) => {
 	const tourId = session.client_reference_id;
 	const userId = (await User.findOne({ email: session.customer_email })).id;
 	const price = session.amount_total / 100;
-	const selectedDate = session.metadata.selectedDate;
 
+	const selectedDate = session.metadata.selectedDate;
 	const tour = await Tour.findOne({ _id: tourId });
 	const index = tour.startDates.findIndex(
 		(date) => date.date.toISOString() === selectedDate,
 	);
-	console.log(index);
+
 	tour.startDates[index].participants++;
 	if (tour.startDates[index].participants >= tour.maxGroupSize) {
 		tour.startDates[index].soldOut = true;
 	}
 	await tour.save();
-	await Booking.create({ tourId, userId, price });
+
+	await Booking.create({ tour: tourId, user: userId, price });
 };
 
 exports.webhookCheckout = (req, res) => {
@@ -77,7 +78,7 @@ exports.webhookCheckout = (req, res) => {
 		event = stripe.webhooks.constructEvent(
 			req.body,
 			signature,
-			process.env.STRIPE_WEBHOOK_SECRET_DEV,
+			process.env.STRIPE_WEBHOOK_SECRET,
 		);
 	} catch (err) {
 		return res.status(400).send(`Webhook error: ${err.message}`);
