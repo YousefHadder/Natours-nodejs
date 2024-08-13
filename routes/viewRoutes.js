@@ -8,8 +8,13 @@ const {
 	getSignupForm,
 	getMyTours,
 	alerts,
+	getVerifyPage,
 } = require('../controllers/viewController');
-const { protect, isLoggedIn } = require('../controllers/authController');
+const {
+	protect,
+	isLoggedIn,
+	verifyEmail,
+} = require('../controllers/authController');
 
 const router = express.Router();
 

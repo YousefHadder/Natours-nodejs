@@ -42,7 +42,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 	// const newUser = await User.create(req.body);
 
 	// Ensuring only the data we want is used to register a new user
-	const newUser = await User.create({
+	const newUser = new User({
 		name: req.body.name,
 		email: req.body.email,
 		photo: req.body.photo,
@@ -51,10 +51,51 @@ exports.signup = catchAsync(async (req, res, next) => {
 		passwordChangedAt: req.body.passwordChangedAt,
 	});
 
-	const url = `${req.protocol}://${req.get('host')}/me`;
-	await new Email(newUser, url).sendWelcome();
+	const emailVerificationToken = newUser.createEmailVerificationToken();
+	await newUser.save();
+	try {
+		const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/users/verifyEmail/${emailVerificationToken}`;
+		await new Email(newUser, verificationUrl).sendEmailVerification();
+		res.status(200).json({
+			status: 'success',
+			message: 'Verification email sent successfully. Check your inbox.',
+		});
+	} catch (error) {
+		return next(
+			new AppError(
+				'There was an error sending email verification. Try again later.',
+				500,
+			),
+		);
+	}
+});
 
-	createSendToken(newUser, 201, req, res);
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+	const hashedToken = crypto
+		.createHash('sha256')
+		.update(req.params.token)
+		.digest('hex');
+
+	const user = await User.findOne({
+		emailVerificationToken: hashedToken,
+		emailVerificationExpires: {
+			$gte: Date.now(),
+		},
+	});
+
+	if (!user) {
+		return next(new AppError('Invalid or expired token', 400));
+	}
+
+	user.verified = true;
+	user.emailVerificationToken = undefined;
+	user.emailVerificationExpires = undefined;
+	await user.save({ validateBeforeSave: false });
+
+	const welcomeUrl = `${req.protocol}://${req.get('host')}/me`;
+	await new Email(user, welcomeUrl).sendWelcome();
+
+	createSendToken(user, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -73,6 +114,14 @@ exports.login = catchAsync(async (req, res, next) => {
 			new AppError(
 				'Account not found, please enter a correct email',
 				401,
+			),
+		);
+	}
+	if (user.verified === false) {
+		return next(
+			new AppError(
+				'Account not verified. Please verify your email.',
+				403,
 			),
 		);
 	}

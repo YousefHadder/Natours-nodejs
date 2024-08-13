@@ -24,6 +24,10 @@ const userSchema = mongoose.Schema({
 		default: true,
 		select: false,
 	},
+	verified: {
+		type: Boolean,
+		default: false,
+	},
 	role: {
 		type: String,
 		enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -49,6 +53,8 @@ const userSchema = mongoose.Schema({
 	passwordChangedAt: Date,
 	passwordResetToken: String,
 	passwordResetExpires: Date,
+	emailVerificationToken: String,
+	emailVerificationExpires: Date,
 	loginAttempts: {
 		type: Number,
 		required: true,
@@ -119,6 +125,16 @@ userSchema.methods.createPasswordResetToken = function () {
 
 	// Will be returned to the client via email.
 	return resetToken;
+};
+
+userSchema.methods.createEmailVerificationToken = function () {
+	const verificationToken = crypto.randomBytes(32).toString('hex');
+	this.emailVerificationToken = crypto
+		.createHash('sha256')
+		.update(verificationToken)
+		.digest('hex');
+	this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+	return verificationToken;
 };
 
 const User = mongoose.model('User', userSchema);
