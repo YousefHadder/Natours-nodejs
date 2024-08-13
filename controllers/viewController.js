@@ -35,6 +35,14 @@ exports.getTourPage = catchAsync(async (req, res, next) => {
 		return next(new AppError('No tour found with that name', 404));
 	}
 
+	const user = res.locals.user || null;
+	if (user) {
+		const booking = await Booking.findOne({
+			tour: tour._id,
+			user: user._id,
+		});
+		res.locals.isBooked = booking ? true : false;
+	}
 	// 2) Render template with the data
 	res.status(200).render('tour', {
 		title: tour.name,
@@ -43,6 +51,9 @@ exports.getTourPage = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
+	if (res.locals.user) {
+		return res.redirect('/me');
+	}
 	res.status(200).render('login', {
 		title: 'Login to your account',
 	});

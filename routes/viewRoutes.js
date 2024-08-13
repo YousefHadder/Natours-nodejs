@@ -8,7 +8,6 @@ const {
 	getSignupForm,
 	getMyTours,
 	alerts,
-	getVerifyPage,
 } = require('../controllers/viewController');
 const {
 	protect,
@@ -22,7 +21,7 @@ router.use(alerts);
 // We add createBookingCheckout here because we create a booking in the database
 // right before redirecting to the path / .
 router.get('/', isLoggedIn, getOverviewPage);
-router.get('/tours/:slug', isLoggedIn, getTourPage);
+router.get('/tour/:slug', isLoggedIn, getTourPage);
 router.get('/login', isLoggedIn, getLoginForm);
 router.get('/signup', isLoggedIn, getSignupForm);
 router.get('/me', protect, getAccount);
