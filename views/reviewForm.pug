@@ -1,0 +1,22 @@
+extends base
+
+block content
+	main.main
+		.login-form
+			h2.heading-secondary.ma-bt-lg Review #{tour.name}
+			form.form.form--review(data-tour-slug=`${tour.slug}` data-tour-id=`${tour.id}`)
+				.form__group
+					textarea#review.form__input.review-box(type='text' placeholder='Write your review here...' required)
+					#rating
+						input#star5(type='radio' name='rating' value='5' class="star")
+						label(for="star5" title="5 stars") &#9733;
+						input#star4(type='radio' name='rating' value='4' class="star")
+						label(for="star4" title="4 stars") &#9733;
+						input#star3(type='radio' name='rating' value='3' class="star")
+						label(for="star3" title="3 stars") &#9733;
+						input#star2(type='radio' name='rating' value='2' class="star")
+						label(for="star2" title="2 stars") &#9733;
+						input#star1(type='radio' name='rating' value='1' class="star")
+						label(for="star1" title="1 star") &#9733;
+				.form__group
+					button.btn.btn--green.submit-review Submit review
