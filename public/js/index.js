@@ -21,6 +21,7 @@ const bookBtn = document.getElementById('book-tour');
 const tourDateSelect = document.getElementById('tourDate');
 
 const ratingInputs = document.querySelectorAll('#rating input');
+
 let selectedRating = 0;
 ratingInputs.forEach((input) => {
 	input.addEventListener('change', function () {
@@ -58,7 +59,7 @@ signupForm?.addEventListener('submit', (e) => {
 reviewForm?.addEventListener('submit', async (e) => {
 	e.preventDefault();
 	const review = document.getElementById('review').value;
-	const rating = selectedRating;
+	const rating = document.querySelector('input[name="rating"]:checked').value;
 	const { tourSlug } = e.target.dataset;
 	const { tourId } = e.target.dataset;
 	await createReview(review, rating, tourSlug, tourId);

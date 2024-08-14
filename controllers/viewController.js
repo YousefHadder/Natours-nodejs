@@ -1,4 +1,5 @@
 const Booking = require('../models/bookingModel');
+const Review = require('../models/reviewModel');
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
@@ -98,6 +99,21 @@ exports.getReviewPage = catchAsync(async (req, res, next) => {
 	res.status(200).render('reviewForm', {
 		title: `Review ${tour.name}`,
 		tour,
+	});
+});
+
+exports.getMyReviews = catchAsync(async (req, res, next) => {
+	const { id } = req.user;
+	const reviews = await Review.find({ user: id }).populate({
+		path: 'tour',
+		select: 'name',
+	});
+	if (!reviews) {
+		return next(new AppError('No reviews found for this user', 404));
+	}
+	res.status(200).render('reviews', {
+		title: 'My Reviews',
+		reviews,
 	});
 });
 

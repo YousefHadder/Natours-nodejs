@@ -9,6 +9,7 @@ const {
 	getMyTours,
 	alerts,
 	getReviewPage,
+	getMyReviews,
 } = require('../controllers/viewController');
 const {
 	protect,
@@ -28,6 +29,7 @@ router.get('/signup', isLoggedIn, getSignupForm);
 router.get('/addReview/:slug', protect, isLoggedIn, getReviewPage);
 router.get('/me', protect, getAccount);
 router.get('/my-tours', protect, getMyTours);
+router.get('/my-reviews', protect, getMyReviews);
 router.post('/submit-user-data', protect, updateUserData);
 
 module.exports = router;
