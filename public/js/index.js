@@ -6,16 +6,27 @@ import { signup } from './signup.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe.js';
 import { showAlert } from './alerts';
+import { createReview } from './review.js';
 
 // DOM ELEMENTS
 const mapbox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
 const logoutBtn = document.querySelector('.nav__el--logout');
+const reviewForm = document.querySelector('.form--review');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
+
 const bookBtn = document.getElementById('book-tour');
 const tourDateSelect = document.getElementById('tourDate');
+
+const ratingInputs = document.querySelectorAll('#rating input');
+let selectedRating = 0;
+ratingInputs.forEach((input) => {
+	input.addEventListener('change', function () {
+		selectedRating = parseInt(this.value);
+	});
+});
 
 if (bookBtn) {
 	bookBtn.disabled = true;
@@ -42,6 +53,15 @@ signupForm?.addEventListener('submit', (e) => {
 	const password = document.getElementById('password').value;
 	const passwordConfirm = document.getElementById('passwordConfirm').value;
 	signup(name, email, password, passwordConfirm);
+});
+
+reviewForm?.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	const review = document.getElementById('review').value;
+	const rating = selectedRating;
+	const { tourSlug } = e.target.dataset;
+	const { tourId } = e.target.dataset;
+	await createReview(review, rating, tourSlug, tourId);
 });
 
 logoutBtn?.addEventListener('click', (e) => {

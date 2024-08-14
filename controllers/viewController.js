@@ -89,6 +89,18 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
 	});
 });
 
+exports.getReviewPage = catchAsync(async (req, res, next) => {
+	const { slug } = req.params;
+	const tour = await Tour.findOne({ slug });
+	if (!tour) {
+		return next(new AppError('No tour found with that name', 404));
+	}
+	res.status(200).render('reviewForm', {
+		title: `Review ${tour.name}`,
+		tour,
+	});
+});
+
 exports.updateUserData = catchAsync(async (req, res, next) => {
 	const { id } = req.user;
 	// 1) Get the user document from the database

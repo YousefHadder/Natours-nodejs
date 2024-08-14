@@ -83,7 +83,9 @@ block content
 				h2.heading-secondary What are you waiting for?
 				p.cta__text #{tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
 				if user
-					if !isBooked
+					if isBooked
+						a.btn.btn--green.span-all-rows(href=`/addReview/${tour.slug}`) Review this tour
+					else
 						.book-tour-container
 							button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}` disabled) Book tour now!
 							select#tourDate(name="tourDate", required)

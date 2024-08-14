@@ -1342,3 +1342,35 @@ body {
 	width: 100%;
 	max-width: 400px;
 }
+
+.review-box {
+	height: 150px;
+	resize: none;
+}
+
+#rating {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: center;
+	margin-bottom: 10px;
+}
+
+#rating input {
+	display: none;
+}
+
+#rating label {
+	font-size: 4em;
+	color: #ccc;
+	cursor: pointer;
+}
+
+#rating input:checked ~ label,
+#rating input:hover ~ label {
+	color: #f39c12;
+}
+
+#rating label:hover,
+#rating label:hover ~ label {
+	color: #f39c12;
+}
