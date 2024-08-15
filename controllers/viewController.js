@@ -117,6 +117,12 @@ exports.getMyReviews = catchAsync(async (req, res, next) => {
 	});
 });
 
+exports.getConfirmationPage = (req, res) => {
+	res.status(200).render('confirmationPage', {
+		title: 'Booking Confirmation',
+	});
+};
+
 exports.updateUserData = catchAsync(async (req, res, next) => {
 	const { id } = req.user;
 	// 1) Get the user document from the database

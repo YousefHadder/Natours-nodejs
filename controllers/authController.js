@@ -54,7 +54,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 	const emailVerificationToken = newUser.createEmailVerificationToken();
 	await newUser.save();
 	try {
-		const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/users/verifyEmail/${emailVerificationToken}`;
+		const verificationUrl = `${req.protocol}://${req.get('host')}/verifyEmail/${emailVerificationToken}`;
 		await new Email(newUser, verificationUrl).sendEmailVerification();
 		res.status(200).json({
 			status: 'success',
@@ -95,7 +95,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 	const welcomeUrl = `${req.protocol}://${req.get('host')}/me`;
 	await new Email(user, welcomeUrl).sendWelcome();
 
-	createSendToken(user, 201, req, res);
+	res.redirect(302, '/confirmationPage');
 });
 
 exports.login = catchAsync(async (req, res, next) => {

@@ -1374,3 +1374,8 @@ body {
 #rating label:hover ~ label {
 	color: #f39c12;
 }
+
+.review-form,
+.confirmation-page {
+	text-align: center;
+}
