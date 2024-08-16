@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://tinyurl.com/Natours-Hadder"><img src="public/img/logo-green.png" alt="Natours" width="400"></a>
+  <a href="https://tinyurl.com/Natours-YHadder"><img src="public/img/logo-green.png" alt="Natours" width="400"></a>
   <br>
   Natours
   <br>
