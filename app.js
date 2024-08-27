@@ -18,6 +18,7 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
 const { webhookCheckout } = require('./controllers/bookingController');
 
 const app = express();
@@ -40,6 +41,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARES
+
 // Implement CORS
 app.use(cors());
 // Access-Control-Allow-Origin *

@@ -42,7 +42,12 @@ exports.getTourPage = catchAsync(async (req, res, next) => {
 			tour: tour._id,
 			user: user._id,
 		});
+		const review = await Review.findOne({
+			tour: tour._id,
+			user: user._id,
+		});
 		res.locals.isBooked = booking ? true : false;
+		res.locals.isReviewed = review ? true : false;
 	}
 	// 2) Render template with the data
 	res.status(200).render('tour', {
@@ -87,18 +92,6 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
 	res.status(200).render('overview', {
 		title: 'My Booked Tours',
 		tours,
-	});
-});
-
-exports.getReviewPage = catchAsync(async (req, res, next) => {
-	const { slug } = req.params;
-	const tour = await Tour.findOne({ slug });
-	if (!tour) {
-		return next(new AppError('No tour found with that name', 404));
-	}
-	res.status(200).render('reviewForm', {
-		title: `Review ${tour.name}`,
-		tour,
 	});
 });
 

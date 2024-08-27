@@ -1,5 +1,6 @@
 extends base
 include _reviewCard
+include _reviewForm
 
 block append head	
 	script(src='https://js.stripe.com/v3/')
@@ -15,6 +16,10 @@ mixin overviewBox(label, text,icon)
 
 
 block content
+	.modal.hidden
+		+reviewForm()
+	.overlay.hidden
+
 	section.section-header
 		.header__hero
 			.header__hero-overlay &nbsp;
@@ -84,12 +89,13 @@ block content
 				p.cta__text #{tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
 				if user
 					if isBooked
-						a.btn.btn--green.span-all-rows(href=`/addReview/${tour.slug}`) Review this tour
+						if !isReviewed
+							button.btn.btn--green.span-all-rows#open-modal Review this tour
 					else
 						.book-tour-container
 							button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}` disabled) Book tour now!
 							select#tourDate(name="tourDate", required)
-								option(value="" disabled selected) -- Choose a Date --
+								option(value="" selected) -- Choose a Date --
 								each date in tour.startDates
 									if date.soldOut === false
 										option(value=date.date) #{date.date.toDateString()}

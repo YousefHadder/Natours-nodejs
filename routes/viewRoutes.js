@@ -27,7 +27,6 @@ router.get('/', isLoggedIn, getOverviewPage);
 router.get('/tour/:slug', isLoggedIn, getTourPage);
 router.get('/login', isLoggedIn, getLoginForm);
 router.get('/signup', isLoggedIn, getSignupForm);
-router.get('/addReview/:slug', protect, isLoggedIn, getReviewPage);
 router.get('/me', protect, getAccount);
 router.get('/my-tours', protect, getMyTours);
 router.get('/verifyEmail/:token', verifyEmail);

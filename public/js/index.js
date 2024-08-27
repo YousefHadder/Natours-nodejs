@@ -9,25 +9,45 @@ import { showAlert } from './alerts';
 import { createReview } from './review.js';
 
 // DOM ELEMENTS
-const mapbox = document.getElementById('map');
+const modal = document.querySelector('.modal');
+const overlay = document.querySelector('.overlay');
+
 const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
-const logoutBtn = document.querySelector('.nav__el--logout');
 const reviewForm = document.querySelector('.form--review');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 
+const logoutBtn = document.querySelector('.nav__el--logout');
+const closeModalBtn = document.querySelector('.close-modal');
+
+const openModalBtn = document.getElementById('open-modal');
 const bookBtn = document.getElementById('book-tour');
+
+const mapbox = document.getElementById('map');
 const tourDateSelect = document.getElementById('tourDate');
 
 const ratingInputs = document.querySelectorAll('#rating input');
 
 let selectedRating = 0;
+
 ratingInputs.forEach((input) => {
 	input.addEventListener('change', function () {
 		selectedRating = parseInt(this.value);
 	});
 });
+
+const openModal = function () {
+	modal.classList.remove('hidden');
+	overlay.classList.remove('hidden');
+	document.body.classList.add('no-scroll'); // Disable scrolling
+};
+
+const closeModal = function () {
+	modal.classList.add('hidden');
+	overlay.classList.add('hidden');
+	document.body.classList.remove('no-scroll'); // Enable scrolling
+};
 
 if (bookBtn) {
 	bookBtn.disabled = true;
@@ -63,6 +83,26 @@ reviewForm?.addEventListener('submit', async (e) => {
 	const { tourSlug } = e.target.dataset;
 	const { tourId } = e.target.dataset;
 	await createReview(review, rating, tourSlug, tourId);
+});
+
+openModalBtn?.addEventListener('click', function () {
+	openModal();
+});
+
+closeModalBtn?.addEventListener('click', function () {
+	closeModal();
+});
+
+overlay?.addEventListener('click', function () {
+	closeModal();
+});
+
+document.addEventListener('keydown', function (e) {
+	// console.log(e.key);
+
+	if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+		closeModal();
+	}
 });
 
 logoutBtn?.addEventListener('click', (e) => {
