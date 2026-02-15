@@ -33,7 +33,7 @@
 		"hpp": "^0.2.3",
 		"html-to-text": "^9.0.5",
 		"jsonwebtoken": "^9.0.3",
-		"mongoose": "^9.1.6",
+		"mongoose": "^9.2.1",
 		"morgan": "^1.10.0",
 		"multer": "^2.0.2",
 		"nodemailer": "^8.0.1",
