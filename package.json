@@ -23,7 +23,7 @@
 		"compression": "^1.7.4",
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.6",
-		"dotenv": "^17.4.1",
+		"dotenv": "^17.4.2",
 		"esbuild": "^0.28.0",
 		"express": "^5.2.1",
 		"express-csp": "^0.1.3",
