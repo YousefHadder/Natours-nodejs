@@ -60,7 +60,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 			status: 'success',
 			message: 'Verification email sent successfully. Check your inbox.',
 		});
-	} catch (error) {
+	} catch {
 		return next(
 			new AppError(
 				'There was an error sending email verification. Try again later.',
@@ -213,32 +213,45 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // Only for rendered pages, no errors!
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
 	if (req.cookies?.jwt) {
-		// 1) Verify token
-		const decoded = await promisify(jwt.verify)(
-			req.cookies.jwt,
-			process.env.JWT_SECRET,
-		);
+		try {
+			// 1) Verify token
+			const decoded = await promisify(jwt.verify)(
+				req.cookies.jwt,
+				process.env.JWT_SECRET,
+			);
 
-		const { id } = decoded;
+			const { id } = decoded;
 
-		// 2) Check if user exists and is not deleted
-		const currUser = await User.findById(id);
-		if (!currUser) {
-			return next();
+			// 2) Check if user exists and is not deleted
+			const currUser = await User.findById(id);
+			if (!currUser) {
+				return next();
+			}
+
+			// 3) Check if user has changed password after token was issued
+			if (currUser.changedPasswordAfter(decoded.iat)) {
+				return next();
+			}
+
+			// THERE IS A LOGGED IN USER
+			res.locals.user = currUser;
+		} catch (err) {
+			if (
+				[
+					'JsonWebTokenError',
+					'TokenExpiredError',
+					'NotBeforeError',
+				].includes(err.name)
+			) {
+				return next();
+			}
+			return next(err);
 		}
-
-		// 3) Check if user has changed password after token was issued
-		if (currUser.changedPasswordAfter(decoded.iat)) {
-			return next();
-		}
-
-		// THERE IS A LOGGED IN USER
-		res.locals.user = currUser;
 	}
 	next();
-});
+};
 
 exports.restrictTo = (...roles) => {
 	return (req, res, next) => {
@@ -276,7 +289,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 			status: 'success',
 			message: 'Reset password email sent',
 		});
-	} catch (err) {
+	} catch {
 		user.passwordResetToken = undefined;
 		user.passwordResetExpires = undefined;
 		await user.save({ validateBeforeSave: false });

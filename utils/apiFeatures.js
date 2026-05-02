@@ -1,3 +1,5 @@
+const { sanitize } = require('express-mongo-sanitize');
+
 class APIFeatures {
 	constructor(docQuery, reqQuery) {
 		this.docQuery = docQuery;
@@ -5,7 +7,7 @@ class APIFeatures {
 	}
 
 	filter() {
-		const queryObj = { ...this.reqQuery };
+		const queryObj = sanitize({ ...this.reqQuery });
 
 		const excludedFields = ['page', 'sort', 'limit', 'fields'];
 		excludedFields.forEach((el) => delete queryObj[el]);

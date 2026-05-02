@@ -29,6 +29,7 @@ coverage/
 bower_components/
 
 # Editor directories and files
+.DS_Store
 .idea/
 .vscode/
 dev-data/
