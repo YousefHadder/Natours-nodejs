@@ -2,11 +2,11 @@ const hpp = require('hpp');
 const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const xss = require('xss-clean');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
+const { sanitize } = require('express-mongo-sanitize');
+const { clean } = require('xss-clean/lib/xss');
 const compression = require('compression');
 const cors = require('cors');
 
@@ -50,7 +50,7 @@ app.use(cors());
 //   origin: 'https://www.natours.com'
 // }))
 
-app.options('*', cors());
+app.options('/{*splat}', cors());
 // app.options('/api/v1/tours/:id', cors());
 
 // Serving static files from the 'public' directory (public folder)
@@ -109,10 +109,27 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data Sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Custom wrapper — express-mongo-sanitize's default middleware assigns to
+// req.query which is read-only in Express 5.
+app.use((req, res, next) => {
+	if (req.body) {
+		req.body = sanitize(req.body);
+	}
+	if (req.headers) {
+		req.headers = sanitize(req.headers);
+	}
+	next();
+});
 
 // Data Sanitization against XSS (Cross-Site Scripting)
-app.use(xss());
+// xss-clean has the same req.query issue; only sanitize req.body.
+// Pug auto-escapes output, so query/params are safe at render time.
+app.use((req, res, next) => {
+	if (req.body) {
+		req.body = clean(req.body);
+	}
+	next();
+});
 
 //prevent parameter pollution
 app.use(
@@ -143,7 +160,7 @@ app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
 
 // All other unimplemented routes return 404
-app.all('*', (req, res, next) => {
+app.all('/{*splat}', (req, res, next) => {
 	next(new AppError(`Cannot find ${req.originalUrl} on this server.`, 404));
 });
 

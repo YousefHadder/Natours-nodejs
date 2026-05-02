@@ -66,30 +66,26 @@ const userSchema = mongoose.Schema({
 userSchema.pre(
 	'save',
 	// run this function if password is modified
-	async function (next) {
+	async function () {
 		if (!this.isModified('password')) {
-			return next();
+			return;
 		}
 		this.password = await bcrypt.hash(this.password, 12);
 		this.passwordConfirm = undefined;
-		next();
 	},
 );
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', function () {
 	// Update changedPasswordAt if password is changed
 	if (!this.isModified('password') || this.isNew) {
-		return next();
+		return;
 	}
 	this.passwordChangedAt = Date.now() - 1000;
-
-	next();
 });
 
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, function () {
 	// (this) points to the current query
 	this.find({ active: { $ne: false } });
-	next();
 });
 
 // Instance method to compare password

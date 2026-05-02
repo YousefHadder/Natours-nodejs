@@ -13,10 +13,11 @@
 
 - ESLint: Airbnb + Prettier + Node plugin (flat config in `eslint.config.mjs`)
 - Prettier: 80-char width, 4-space tabs, single quotes, semicolons required (`.prettierrc`)
+- No npm lint/format scripts are configured; run ESLint/Prettier directly if needed
 
 ## Architecture
 
-**Stack**: Node.js 20.x, Express, MongoDB/Mongoose, Pug (SSR), Stripe, esbuild
+**Stack**: Node.js 20.x, Express 5.x, MongoDB/Mongoose 9.x, Pug (SSR), Stripe, esbuild
 
 **Pattern**: MVC with factory-based CRUD handlers
 
@@ -56,10 +57,20 @@ cookie parser, mongo sanitize, XSS clean, HPP, compression
 
 ## Environment
 
-Config via `config.env` (see `config.env.example`): MongoDB URI, JWT secret/expiry,
-email (Mailtrap dev / OAuth prod), Stripe keys, login lockout settings
+Config via `config.env` (see `config.env.example` for core values): MongoDB URI,
+JWT secret/expiry, email (Mailtrap dev / OAuth prod), and login lockout settings.
+Code also expects `MAILTRAP_FROM`, `STRIPE_SECRET_KEY`, and
+`STRIPE_WEBHOOK_SECRET`; keep these in local/hosting env only.
+
+## Gotchas
+
+- Keep `/webhook-checkout` in `app.js` before `express.json()` so Stripe can
+  verify the raw request body.
+- Express 5 makes `req.query` read-only; sanitizers in `app.js` intentionally
+  sanitize body/headers rather than assigning to `req.query`.
 
 ## CI/CD
 
-- Dependabot only (`.github/dependabot.yml`), no GitHub Actions workflows
+- Dependabot (`.github/dependabot.yml`) + auto-merge workflow (`.github/workflows/dependabot-automerge.yml`)
+  - Auto-approves and squash-merges patch/minor dependency updates
 - Deployed on Render.com

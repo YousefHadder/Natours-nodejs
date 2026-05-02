@@ -161,27 +161,24 @@ tourSchema.virtual('durationWeeks').get(function () {
 // 1) Document Middleware
 
 // runs before save and create commands, but not insert Many
-tourSchema.pre('save', function (next) {
+tourSchema.pre('save', function () {
 	this.slug = slugify(this.name, { lower: true });
-	next();
 });
 
 // 2) Query Middleware
 
 // Calculate Query execution time
-tourSchema.pre(/^find/, function (next) {
+tourSchema.pre(/^find/, function () {
 	this.find({ secretTour: { $ne: true } });
 	this.start = Date.now();
-	next();
 });
 
 // Populate guides in the response
-tourSchema.pre(/^find/, function (next) {
+tourSchema.pre(/^find/, function () {
 	this.populate({
 		path: 'guides',
 		select: '-__v -passwordChangedAt -loginAttempts -lockUntil',
 	});
-	next();
 });
 
 // Log query execution time
