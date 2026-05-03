@@ -1,0 +1,52 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Validate dependency resolution
+              run: npm install --package-lock-only --dry-run
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Find changed JavaScript files
+              id: changed-js
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+              run: |
+                  files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.js' '*.mjs' | tr '\n' ' ')
+                  echo "files=$files" >> "$GITHUB_OUTPUT"
+
+            - name: Lint changed JavaScript
+              if: steps.changed-js.outputs.files != ''
+              run: npx eslint ${{ steps.changed-js.outputs.files }}
+
+            - name: Syntax-check application JavaScript
+              run: |
+                  find app.js server.js controllers models routes utils -name '*.js' -print0 \
+                    | xargs -0 -n 1 node --check
+
+            - name: Build frontend bundle
+              run: npm run build:js
